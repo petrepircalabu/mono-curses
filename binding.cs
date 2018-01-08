@@ -55,10 +55,10 @@ namespace Unix.Terminal {
 			if (File.Exists ("/usr/lib/libncurses.dylib"))
 				curses_handle = dlopen ("libncurses.dylib", 0);
 			else
-				curses_handle = dlopen ("libncurses.so", 0);
+				curses_handle = dlopen ("libncurses.so", 2);
 			
 			if (curses_handle == IntPtr.Zero)
-				throw new Exception ("Could not dlopen ncurses");
+				throw new Exception ("Could not dlopen ncurses " + dlerror() );
 
 			stdscr = read_static_ptr ("stdscr");
 			curscr_ptr = get_ptr ("curscr");
@@ -314,11 +314,14 @@ namespace Unix.Terminal {
 		
 #endregion
 		
-		[DllImport ("libc")]
+		[DllImport ("dl")]
 		extern static IntPtr dlopen (string file, int mode);
 
-		[DllImport ("libc")]
+		[DllImport ("dl")]
 		extern static IntPtr dlsym (IntPtr handle, string symbol);
+
+		[DllImport ("dl")]
+		extern static string dlerror ();
 
 		static IntPtr stdscr;
 
